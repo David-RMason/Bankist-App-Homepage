@@ -16,6 +16,7 @@ let header = document.querySelector(".header");
 let navHeight = navBar.getBoundingClientRect().height;
 let allSections = document.querySelectorAll(".section");
 let imgTargets = document.querySelectorAll("img[data-src]");
+let slides = document.querySelectorAll(".slide");
 
 ///////////////////////////////////////
 // Modal window
@@ -237,22 +238,69 @@ window.onbeforeunload = function () {
   window.scrollTo(0, 0);
 };
 
-// Hamburger Button
+const openMenu = function () {
+  nav__links.classList.remove("hidden");
+  hamburger.textContent = "✕";
+
+  // Lock scrolling
+  document.body.style.overflow = "hidden";
+};
+
+const closeMenu = function () {
+  nav__links.classList.add("hidden");
+  hamburger.textContent = "☰";
+
+  // Unlock scrolling
+  document.body.style.overflow = "";
+};
+
 hamburger.addEventListener("click", function (e) {
-  nav__links.classList.toggle("hidden");
+  e.stopPropagation();
 
-  // Change hamburger text between X and ☰
   if (nav__links.classList.contains("hidden")) {
-    hamburger.textContent = "☰";
+    openMenu();
   } else {
-    hamburger.textContent = "✕";
+    closeMenu();
   }
 });
 
-// Close mobile menu when a link is clicked
-document.querySelector(".nav__links").addEventListener("click", function (e) {
+// Close mobile menu when a nav link is clicked
+nav__links.addEventListener("click", function (e) {
   if (e.target.classList.contains("nav__link")) {
-    nav__links.classList.add("hidden");
-    hamburger.textContent = "☰";
+    closeMenu();
   }
 });
+
+// Close when clicking outside menu
+document.addEventListener("click", function (e) {
+  const clickedInsideMenu = nav__links.contains(e.target);
+  const clickedHamburger = hamburger.contains(e.target);
+
+  if (!clickedInsideMenu && !clickedHamburger) {
+    closeMenu();
+  }
+});
+
+function setSlideHeights() {
+  let maxHeight = 0;
+
+  slides.forEach((slide) => {
+    slide.style.height = "auto";
+  });
+
+  slides.forEach((slide) => {
+    const height = slide.getBoundingClientRect().height;
+
+    if (height > maxHeight) {
+      maxHeight = height;
+    }
+  });
+
+  document.querySelector(".slider").style.height = maxHeight + 50 + "px";
+
+  slides.forEach((slide) => {
+    slide.style.height = maxHeight + "px";
+  });
+}
+window.addEventListener("resize", setSlideHeights);
+setSlideHeights();
